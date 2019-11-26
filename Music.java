@@ -5,56 +5,41 @@
  */
 package Game;
 
+import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.JOptionPane;
+
 /**
 
  @author wills
  */
-import sun.audio.*;
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.*;
+
 public class Music
 {
-   public static void main(String[] args)
-{
-    JFrame frame = new JFrame();
-    frame.setSize(200,200);
-    frame.setLocationRelativeTo(null);
-    JButton button = new JButton("Click me");
-    frame.add(button);
-    button.addActionListener(new AL());
-    frame.setVisible(true);
-}
-    public static class AL implements ActionListener{
-        public final void actionPerformed(ActionEvent e){
-            music();
-    }
-}
-
-    public static void music() 
-    {       
-        AudioPlayer MGP = AudioPlayer.player;
-        AudioStream BGM;
-        AudioData MD;
-
-        ContinuousAudioDataStream loop = null;
-
-        try
+  void playMusic (String musicPath)
+  {
+     try
+     {
+        File mFile = new File(musicPath);
+        if(mFile.exists())
         {
-            InputStream test = new FileInputStream("C:\\Music1.wmv");
-            BGM = new AudioStream(test);
-            AudioPlayer.player.start(BGM);
-            MD = BGM.getData();
-            loop = new ContinuousAudioDataStream(MD);
-
-        }
-        catch(FileNotFoundException e){
-            System.out.print(e.toString());
-        }
-        catch(IOException error)
+           AudioInputStream audioInput = AudioSystem.getAudioInputStream( mFile );
+           Clip clip = AudioSystem.getClip();
+           clip.open(audioInput);
+           clip.start();   
+           clip.loop(Clip.LOOP_CONTINUOUSLY);
+           
+           JOptionPane.showMessageDialog(null, "Press ok to stop" );
+        } else
         {
-            System.out.print(error.toString());
+           System.out.println("File not found");
         }
-        MGP.start(loop);
-    }
+     }
+     catch(Exception ex)
+     {
+        ex.printStackTrace();
+     }
+  }
 }
