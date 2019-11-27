@@ -1,8 +1,3 @@
-/*
- To change this license header, choose License Headers in Project Properties.
- To change this template file, choose Tools | Templates
- and open the template in the editor.
- */
 package Game;
 
 import java.io.File;
@@ -15,7 +10,6 @@ import javax.sound.sampled.FloatControl;
  This class reads in the music file provided by the main and checks if it exists
  in the file. If it does then it plays the song forever until the program is
  closed
-
  @author William Sarabia
  */
 public class Music

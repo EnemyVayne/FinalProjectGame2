@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Game;
 
 import javafx.scene.paint.Color;
@@ -12,12 +7,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
-
  @author William Sarabia
  */
 public class Coins extends Pane
 {
-   private int coins = 0;
+   private static int coins = 0;
    private Label coinLabel;
    
    public Label displayCoins(int coins)
@@ -31,12 +25,13 @@ public class Coins extends Pane
   
    public int getCoins()
    {
-      return this.coins;
+      return Coins.coins;
    }
    
-   public void setCoins(int coins)
+   
+   public static void setCoins(int coins)
    {
-      this.coins =+ coins;
+      Coins.coins += coins;
    }
    
    

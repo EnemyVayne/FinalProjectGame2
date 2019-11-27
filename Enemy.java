@@ -153,6 +153,11 @@ public class Enemy extends Pane
    {
       return (new Rectangle(xPos+xWidth/2, yPos+yHeight/2, xWidth, yHeight));
    }
+   
+   public void Die()
+   {
+       Coins.setCoins(( int ) ((Math.random() * ((10 - 1) + 1)) + 1));
+   }
 
    protected void moveEnemy()
    {
@@ -164,40 +169,30 @@ public class Enemy extends Pane
             {
                moveDown();
             }
-//            else
-//            {
             moveUp();
-//            }
             break;
          case 2:
             if(yPos >= 710)
             {
                moveUp();
             }
-//            else
-//            {
                moveDown();
-//            }
             break;
          case 3:
             if(xPos <= 0)
             {
                moveRight();
             }
-//            else
-//            {
                moveLeft();
-//            }
             break;
          case 4:
             if(xPos >= 1240)
             {
                moveLeft();
             }
-//            else
-//            {
+
                moveRight();  
-//            }
+
             break;
       }
 
