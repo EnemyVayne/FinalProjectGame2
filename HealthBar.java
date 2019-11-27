@@ -1,7 +1,6 @@
 package Game;
 
 import javafx.animation.KeyFrame;
-import javafx.scene.layout.Pane;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
@@ -15,23 +14,29 @@ import javafx.util.Duration;
  */
 public class HealthBar extends Pane
 {
+   
+   private double xPos = Game.WIDTH / 2 - 150, yPos = 10;
+   private double xWidth = 300, yHeight = 25;
+   private Rectangle rectangleGreen = new Rectangle(xPos, yPos, xWidth, yHeight);
+   private Rectangle rectangleRed = new Rectangle(xPos, yPos, xWidth, yHeight);
 
-   private double xPos = Game.WIDTH/2-150, yPos = 10;
-   private double xWidth = 300, yHeight = 25 ;
-   private Rectangle rectangle = new Rectangle(xPos, yPos, xWidth, yHeight);
-   private double speedX = 50;
-   private Timeline animation1;
+   private double speedX = 1;
+   private Timeline animation;
+   
+   Player player;
 
    public HealthBar()
    {
-      rectangle.setFill(Color.GREEN);
-      rectangle.setStroke(Color.BLACK);
-      getChildren().add(rectangle);
+      rectangleGreen.setFill(Color.GREEN);
+      rectangleGreen.setStroke(Color.BLACK);
+      rectangleRed.setFill(Color.RED);
+      rectangleRed.setStroke(Color.BLACK);
+      getChildren().addAll(rectangleRed, rectangleGreen);
 
-      animation1 = new Timeline(
-              new KeyFrame(Duration.millis(.1), e -> LowerHealth()));
-      animation1.setCycleCount(Timeline.INDEFINITE);
-      animation1.play();
+      animation = new Timeline(
+              new KeyFrame(Duration.millis(1), e -> HealthBarMovement()));
+      animation.setCycleCount(Timeline.INDEFINITE);
+      animation.play();
    }
 
    /**
@@ -39,7 +44,7 @@ public class HealthBar extends Pane
     */
    public void play()
    {
-      animation1.play();
+      animation.play();
    }
 
    /**
@@ -48,24 +53,47 @@ public class HealthBar extends Pane
     */
    public void pause()
    {
-      animation1.pause();
+      animation.pause();
    }
 
-   
    /**
     * Used to bind the rate of application.
-    * 
+    *
     * @return Binding property value for rate.
     */
    public DoubleProperty rateProperty()
    {
-      return animation1.rateProperty();
+      return animation.rateProperty();
    }
    
-   
-      protected void LowerHealth()
+   public double getHealthWidth()
+   {
+      return xWidth;
+   }
+
+   public void LowerHealth()
+   {
+      if ( xWidth > 0 )
+      {
+         xWidth -= speedX;
+      }
+
+
+
+   }
+
+   public void RaiseHealth()
+   {
+      if ( xWidth < 300  && xWidth != 0)
+      {
+         xWidth += speedX;
+      }
+   }
+
+   protected void HealthBarMovement()
    {
 
-       this.xWidth -= speedX;
+      rectangleGreen.setWidth(xWidth);
+
    }
 }
