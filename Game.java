@@ -12,6 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.shape.Rectangle;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
@@ -40,6 +41,7 @@ public class Game extends Application
    Player player = new Player();
    HealthBar healthBar = new HealthBar();
    Enemy enemy = new Enemy();
+   Coins coins = new Coins();
 
    /**
     * The method opens the stage, and creates numerous different objects, which
@@ -81,26 +83,32 @@ public class Game extends Application
 
       VBox titlePane1 = new VBox();
       StackPane titlePane2 = new StackPane();
+      HBox coinPane = new HBox();
+      coinPane.setAlignment( Pos.TOP_LEFT);
+      
 
       rootPaneTitle.getChildren().addAll(titlePane2, titlePane1);
-      rootPaneHome.getChildren().addAll(backgroundHome, player, healthBar, enemy);
+      rootPaneHome.getChildren().addAll(backgroundHome, player, healthBar, enemy, coinPane);
 
       Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
       Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
       Scene ExploreScreen = new Scene(rootPaneExplore, WIDTH, HEIGHT);
+      
+      
+
+      titleLabel = new Label("The Suave Squad");
+      titleSpace = new Label("Please press Space to continue...");
       
       String Filepath = "Test1.wav";
       
       Music musicObj = new Music();
       musicObj.playMusic( Filepath );
 
-      titleLabel = new Label("The Suave Squad");
-      titleSpace = new Label("Please press Space to continue...");
-
       titleLabel.setFont(Font.font("", FontWeight.BOLD, 70));
       titleSpace.setFont(Font.font(30));
 
       titleLabel.setUnderline(true);
+      titleLabel.setTextFill(Color.WHITE);
       titleLabel.setTextFill(Color.WHITE);
       titleSpace.setTextFill(Color.WHITE);
       titleLabel.setAlignment(Pos.CENTER);
@@ -111,6 +119,7 @@ public class Game extends Application
               HEIGHT / 2 - 50, WIDTH / 2 - 300));
 
       titlePane1.getChildren().addAll(titleLabel, titleSpace);
+      coinPane.getChildren().addAll(coins.displayCoins(coins.getCoins()));
       titlePane2.getChildren().add(backgroundTitle);
 
       stage.setTitle("Kyle And Wills RPG");
