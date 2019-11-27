@@ -88,6 +88,11 @@ public class Game extends Application
       Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
       Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
       Scene ExploreScreen = new Scene(rootPaneExplore, WIDTH, HEIGHT);
+      
+      String Filepath = "Test1.wav";
+      
+      Music musicObj = new Music();
+      musicObj.playMusic( Filepath );
 
       titleLabel = new Label("The Suave Squad");
       titleSpace = new Label("Please press Space to continue...");
