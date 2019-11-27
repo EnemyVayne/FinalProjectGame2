@@ -157,7 +157,7 @@ public class Player extends Pane
 
       setX(Game.WIDTH / 2);
       setY(Game.HEIGHT / 2 - radius);
-      HealthBar.setHealth(300);
+      PlayerHealthBar.setHealth(300);
       
    }
    

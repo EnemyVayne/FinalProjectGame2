@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.shape.Rectangle;
 import javafx.animation.KeyFrame;
@@ -46,11 +47,15 @@ public class Game extends Application
     private boolean boundaryChange = false;
     private boolean enemyCollision = false;
     private boolean playerDead = false;
+    private boolean enemyDead = false;
+
 
     Stage stage = new Stage();
     Player player = new Player();
-    HealthBar healthBar = new HealthBar();
+    PlayerHealthBar playerHealthBar = new PlayerHealthBar();
+    EnemyHealthBar enemyHealthBar = new EnemyHealthBar();
     Enemy enemy = new Enemy();
+    Coins coins = new Coins();
 
     /**
      * The method opens the stage, and creates numerous different objects, which
@@ -89,16 +94,14 @@ public class Game extends Application
         StackPane rootPaneHome = new StackPane();
         StackPane rootPaneExplore = new StackPane();
 
-        
-        
-
-
         VBox titlePane1 = new VBox();
         StackPane titlePane2 = new StackPane();
+        HBox coinPane = new HBox();
+        coinPane.setAlignment(Pos.TOP_LEFT);
 
         rootPaneTitle.getChildren().addAll(titlePane2, titlePane1);
-        rootPaneHome.getChildren().addAll(backgroundHome, player, healthBar,
-                enemy);
+        rootPaneHome.getChildren().addAll(backgroundHome, player, enemy,
+                playerHealthBar, enemyHealthBar, coinPane);
 
         Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
         Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
@@ -106,6 +109,11 @@ public class Game extends Application
 
         titleLabel = new Label("The Suave Squad");
         titleSpace = new Label("Please press Space to continue...");
+
+        String Filepath = "MainMusic.wav";
+
+        Music musicObj = new Music();
+        musicObj.playMusic(Filepath);
 
         titleLabel.setFont(Font.font("", FontWeight.BOLD, 70));
         titleSpace.setFont(Font.font(30));
@@ -122,6 +130,7 @@ public class Game extends Application
 
         titlePane1.getChildren().addAll(titleLabel, titleSpace);
         titlePane2.getChildren().add(backgroundTitle);
+        coinPane.getChildren().addAll(coins.displayCoins(coins.getCoins()));
 
         stage.setTitle("Kyle And Wills RPG");
 
@@ -186,23 +195,28 @@ public class Game extends Application
         });
 
         player.requestFocus();
-        
-        
-//              EventHandler<ActionEvent> deathHandler = e
-//              -> 
-//              {
-//                 if (playerDead)
-//                 {
-//
-//                 }
-//
-//      };
-//              
-//                    death = new Timeline(
-//              new KeyFrame(Duration.millis(10), deathHandler));
-//      death.setCycleCount(Timeline.INDEFINITE);
-//      death.play();
 
+              EventHandler<ActionEvent> deathHandler = e
+              -> 
+              {
+                 if (enemyDead)
+                 {
+
+                    rootPaneHome.getChildren().removeAll(enemy,enemyHealthBar);
+
+                 }
+
+      };
+              
+
+              
+                    death = new Timeline(
+              new KeyFrame(Duration.millis(10), deathHandler));
+      death.setCycleCount(Timeline.INDEFINITE);
+      death.play();
+      
+
+      
         loop2 = new Timeline(
                 new KeyFrame(Duration.millis(25), e -> BoundaryCheck()));
         loop2.setCycleCount(Timeline.INDEFINITE);
@@ -263,20 +277,40 @@ public class Game extends Application
         {
             enemyCollision = true;
             
-            if(healthBar.getHealth() >= 1)
+            
+            if ( playerHealthBar.getHealth() >= 1 )
             {
-                healthBar.LowerHealth();
-            }
-            else if(healthBar.getHealth() == 0)
+                playerHealthBar.LowerHealth();
+            } 
+            else if ( playerHealthBar.getHealth() == 0 )
             {
                 player.Die();
-                playerDead=true;
+                playerDead = true;
+            }
+            if ( enemyHealthBar.getHealth() > 0 )
+            {
+
+                 enemyHealthBar.LowerHealth();
+            } 
+            else if ( enemyHealthBar.getHealth() == 0 )
+            {
+                int coin = 0;
+                enemyDead = true;
+                
+                while(coin<1)
+                {
+                    Coins.setCoins(( int ) ((Math.random() * ((10 - 1) + 1)) + 1));
+                    coins.displayCoins(coins.getCoins());
+                    System.out.println(coins.getCoins());
+                  coin++;
+                }
+
             }
 
         } else
         {
             enemyCollision = false;
-            healthBar.RaiseHealth();
+            playerHealthBar.RaiseHealth();
         }
 
         if ( enemyCollision )
@@ -286,7 +320,6 @@ public class Game extends Application
         {
             enemy.playEnemy();
         }
-
 
     }
 
