@@ -9,37 +9,36 @@ import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.JOptionPane;
 
 /**
-
- @author wills
+ This class reads in the music file provided by the main and checks if it exists
+ in the file. If it does then it plays the song forever until the program is 
+ closed
+ @author William Sarabia
  */
-
 public class Music
 {
-  void playMusic (String musicPath)
-  {
-     try
-     {
-        File mFile = new File(musicPath);
-        if(mFile.exists())
-        {
-           AudioInputStream audioInput = AudioSystem.getAudioInputStream( mFile );
-           Clip clip = AudioSystem.getClip();
-           clip.open(audioInput);
-           clip.start();   
-           clip.loop(Clip.LOOP_CONTINUOUSLY);
-           
-           JOptionPane.showMessageDialog(null, "Press ok to stop" );
-        } else
-        {
-           System.out.println("File not found");
-        }
-     }
-     catch(Exception ex)
-     {
-        ex.printStackTrace();
-     }
-  }
+
+   void playMusic( String musicPath )
+   {
+      try
+      {
+         File mFile = new File( musicPath );
+         if ( mFile.exists() )
+         {
+            AudioInputStream audioInput = AudioSystem.getAudioInputStream( mFile );
+            Clip clip = AudioSystem.getClip();
+            clip.open( audioInput );
+            clip.start();
+            clip.loop( Clip.LOOP_CONTINUOUSLY );
+
+         } else
+         {
+            System.out.println( "File not found" );
+         }
+      } catch ( Exception ex )
+      {
+         ex.printStackTrace();
+      }
+   }
 }
