@@ -17,9 +17,10 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 /**
- * The class "Game" is the overarching application, it sets the window up, and 
- * creates the panes/scenes/stages. The game starts off by declaring global 
+ * The class "Game" is the overarching application, it sets the window up, and
+ * creates the panes/scenes/stages. The game starts off by declaring global
  * variables to be used throughout the application.
+ *
  * @author Kyle_Faith
  */
 public class Game extends Application
@@ -34,25 +35,30 @@ public class Game extends Application
    private Timeline loop2;
    private Label titleLabel, titleSpace;
    private boolean boundaryChange = false;
+   private boolean enemyCollision = false;
 
    Player player = new Player();
+   HealthBar healthBar = new HealthBar();
+   Enemy enemy = new Enemy();
 
    /**
-    * The method opens the stage, and creates numerous different objects, which 
-    * are used to create the panes and scenes. The method starts by first 
+    * The method opens the stage, and creates numerous different objects, which
+    * are used to create the panes and scenes. The method starts by first
     * creating the stage and setting its dimensions, then moves on to creating
-    * the backgrounds for the panes. The first scene shown is the titlescreen, 
-    * which contains two labels. It then requires user input of a space to progress
-    * onto the next scene, which is the main game. The new scene has a new player
-    * which uses button commands to move. When walking out of the scene, the 
-    * player moves to the opposite side,as if he was to spawn into a new area. 
+    * the backgrounds for the panes. The first scene shown is the title screen,
+    * which contains two labels. It then requires user input of a space to
+    * progress onto the next scene, which is the main game. The new scene has a
+    * new player which uses button commands to move. When walking out of the
+    * scene, the player moves to the opposite side,as if he was to spawn into a
+    * new area.
+    *
     * @param stage The first window to be created.
-    * @throws Exception 
+    * @throws Exception
     */
    @Override
    public void start( Stage stage ) throws Exception
    {
-
+      
       stage.setResizable(false);
       stage.show();
       stage.setX(300);
@@ -66,6 +72,9 @@ public class Game extends Application
       Rectangle backgroundHome = new Rectangle(WIDTH, HEIGHT);
       Rectangle backgroundExplore = new Rectangle(WIDTH, HEIGHT);
 
+      backgroundHome.setFill(colorRoom);
+      backgroundExplore.setFill(colorGrass);
+
       StackPane rootPaneTitle = new StackPane();
       StackPane rootPaneHome = new StackPane();
       StackPane rootPaneExplore = new StackPane();
@@ -74,8 +83,11 @@ public class Game extends Application
       StackPane titlePane2 = new StackPane();
 
       rootPaneTitle.getChildren().addAll(titlePane2, titlePane1);
+      rootPaneHome.getChildren().addAll(backgroundHome, player, healthBar, enemy);
 
       Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
+      Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
+      Scene ExploreScreen = new Scene(rootPaneExplore, WIDTH, HEIGHT);
 
       titleLabel = new Label("The Suave Squad");
       titleSpace = new Label("Please press Space to continue...");
@@ -91,7 +103,7 @@ public class Game extends Application
 
       titleSpace.setPadding(new Insets(0, 0, 0, 57.5));
       titlePane1.setPadding(new Insets(HEIGHT / 2 - 100, WIDTH / 2 - 300,
-                                       HEIGHT / 2 - 50, WIDTH / 2 - 300));
+              HEIGHT / 2 - 50, WIDTH / 2 - 300));
 
       titlePane1.getChildren().addAll(titleLabel, titleSpace);
       titlePane2.getChildren().add(backgroundTitle);
@@ -100,70 +112,99 @@ public class Game extends Application
 
       stage.setScene(TitleScreen);
 
-      player.setOnKeyPressed(e -> 
+      player.setOnKeyPressed(e
+              -> 
               {
                  switch ( e.getCode() )
                  {
+
                     case UP:
                        player.moveUp();
+                       
+                       if ( boundaryChange )
+                       {
+                          rootPaneExplore.getChildren().addAll(backgroundExplore, player);
+                          stage.setScene(ExploreScreen);
+                       }
+                       if (enemyCollision)
+                       {
+                          
+                       }
                        break;
                     case DOWN:
                        player.moveDown();
+                       if ( boundaryChange )
+                       {
+                          rootPaneExplore.getChildren().addAll(backgroundExplore, player);
+                          stage.setScene(ExploreScreen);
+                          boundaryChange = false;
+                       }
                        break;
                     case LEFT:
                        player.moveLeft();
+                       if ( boundaryChange )
+                       {
+                          rootPaneExplore.getChildren().addAll(backgroundExplore, player);
+                          stage.setScene(ExploreScreen);
+                          boundaryChange = false;
+                       }
                        break;
                     case RIGHT:
                        player.moveRight();
+                       if ( boundaryChange )
+                       {
+                          rootPaneExplore.getChildren().addAll(backgroundExplore, player);
+                          stage.setScene(ExploreScreen);
+                          boundaryChange = false;
+                       }
                  }
-               });
+      });
 
-      rootPaneHome.getChildren().addAll(backgroundHome, player);
-
-      backgroundHome.setFill(colorRoom);
-
-      Scene homeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
-
-      TitleScreen.setOnKeyPressed(e -> 
+      TitleScreen.setOnKeyPressed(e
+              -> 
               {
                  switch ( e.getCode() )
                  {
                     case SPACE:
-                       stage.setScene(homeScreen);
+                       stage.setScene(HomeScreen);
                        break;
                  }
-               });
+      });
 
       player.requestFocus();
-//      homeScreen.setOnKeyPressed(e -> 
-//              {                  if debugging use this to find player position
-//                 switch ( e.getCode() )
-//                 {
-//                    case A:
-//                       System.out.println("the players x position is: " +
-//                               player.getX());
-//                       System.out.println("the players y position is: " + 
-//                               player.getY());
-//                       System.out.println();
-//                       break;
-//
-//                 }
-//      });
 
-//      if ( boundaryChange )
-//      {
-//         stage.setScene(TitleScreen);
-//      }
+      //if debugging change which screen, and then push a to get player coordinates.
+      ExploreScreen.setOnKeyPressed(e
+              -> 
+              {
+                 switch ( e.getCode() )
+                 {
+                    case A:
+                       System.out.println("the players x position is: "
+                               + player.getX());
+                       System.out.println("the players y position is: "
+                               + player.getY());
+                       System.out.println();
+                       break;
+
+                 }
+      });
+
       loop2 = new Timeline(
               new KeyFrame(Duration.millis(25), e -> BoundaryCheck()));
       loop2.setCycleCount(Timeline.INDEFINITE);
       loop2.play();
+      
+      
+
+      
    }
 
    /**
     * The method checks to see if the players current coordinates are within the
-    * boundary set, and if the player moves out of the boundary, it sets the 
-    * coordinates to the opposite side.
+    * boundary set, and if the player moves out of the boundary, it sets the
+    * coordinates to the opposite side. (boundaryChange is not used yet, will be
+    * used on checkpoint 2 to allow player to truly step into new scenes.)
     */
    public void BoundaryCheck()
    {
@@ -192,6 +233,15 @@ public class Game extends Application
       {
          player.setY(topBoundary);
          boundaryChange = true;
+      }
+   }
+   
+   public void CollisionDetection()
+   {
+      if (player.getBoundsInLocal().getWidth() >= enemy.getBoundsInLocal().getWidth())
+      {
+         System.out.println("WEVE COLLIDED WITH THE ENEMY SIR");
+         enemyCollision = true;
       }
    }
 

@@ -1,42 +1,36 @@
 package Game;
 
 import javafx.animation.KeyFrame;
+import javafx.scene.layout.Pane;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
- * The class is used to create a player, and set the animation/move operations
- * for the player. The animation is set to refresh every .1 milliseconds, and
- * checks the method "movePlayer" every time it ticks. The ticks cause the 
- * player to move based on the location of the center of the circle.
- * @author KyleFaith
+ *
+ * @author kylef
  */
-public class Player extends Pane
+public class Enemy extends Pane
 {
 
-   private final double radius = 30;
-   private double x = Game.WIDTH / 2 , y = Game.HEIGHT / 2 - radius;
-   private double speedX = 10, speedY = 10;
-   private Circle circle = new Circle(x, y, radius);
+   private double xPos = Math.random() * 1262.62, yPos = Math.random() * 737.37;
+   private double xWidth = 50, yHeight = 50 ;
+   private Rectangle rectangle = new Rectangle(xPos, yPos, xWidth, yHeight);
+   private double speedX = 7;
+   private double speedY = 7;
    private Timeline animation;
 
-   
-   /**
-    * The method is used to create a player in the shape of a circle,
-    * add the player to a pane, and create an animation for said player. 
-    */
-   public Player()
+   public Enemy()
    {
-      circle.setFill(Color.GREEN);
-      circle.setStroke(Color.BLACK);
-      getChildren().add(circle);
+      rectangle.setFill(Color.RED);
+      rectangle.setStroke(Color.BLACK);
+      getChildren().add(rectangle);
 
       animation = new Timeline(
-              new KeyFrame(Duration.millis(.1), e -> movePlayer()));
+              new KeyFrame(Duration.millis(.1), e -> moveEnemy()));
       animation.setCycleCount(Timeline.INDEFINITE);
       animation.play();
    }
@@ -50,15 +44,15 @@ public class Player extends Pane
    }
 
    /**
-    * The method is used to pause the game, and can be started again by using 
+    * The method is used to pause the game, and can be started again by using
     * start method.
     */
    public void pause()
    {
       animation.pause();
    }
-
-   /**
+   
+      /**
     * Used to bind the rate of application.
     * 
     * @return Binding property value for rate.
@@ -67,15 +61,15 @@ public class Player extends Pane
    {
       return animation.rateProperty();
    }
-
-   /**
+   
+      /**
     * The method is used to move the player north. The method works by taking a 
     * specified speed and adding it to the coordinate of the player so it moves
     * by the speed every tick of the animation.
     */
    public void moveUp()
    {
-      y -= speedY;
+      yPos -= speedY;
    }
    
    /**
@@ -85,7 +79,7 @@ public class Player extends Pane
     */
    public void moveDown()
    {
-      y += speedY;
+      yPos += speedY;
    }
 
     /**
@@ -95,7 +89,7 @@ public class Player extends Pane
     */
    public void moveLeft()
    {
-      x -= speedX;
+      xPos -= speedX;
    }
 
     /**
@@ -105,34 +99,17 @@ public class Player extends Pane
     */
    public void moveRight()
    {
-      x += speedX;
-   }
-
-   /**
-    * The method is used to set the private variable x to a different value.
-    * @param x is a coordinate of player
-    */
-   public void setX( int x )
-   {
-      this.x = x;
-   }
-   /**
-    * The method is used to set the private variable y to a different value.
-    * @param y is a coordinate of player
-    */
-   public void setY( int y )
-   {
-      this.y = y;
+      xPos += speedX;
    }
    
-   /**
+      /**
     * The method grabs the private variable x to be able to use within different
     * classes.
     * @return Returns the variable found in Player class.
     */
    public double getX()
    {
-      return x;
+      return xPos;
    }
 
    /**
@@ -142,39 +119,36 @@ public class Player extends Pane
     */
    public double getY()
    {
-      return y;
+      return yPos;
    }
-
    
+
    public double getRightBoundryX()
    {
-      return x + (radius/2);
+      return xPos + (xWidth/2);
    }
    
    public double getLeftBoundryX()
    {
-      return x - (radius/2);
+      return xPos - (xWidth/2);
    }
 
    public double getTopBoundryY()
    {
-      return y + (radius/2);
+      return yPos + (yHeight/2);
    }
    
    public double getBottomBoundryY()
    {
-      return y - (radius/2);
-   }
-   /**
-    * The method is used to move the players coordinates, and is the main movement
-    * command. The movePlayer method is looped through every time the animation
-    * takes place(every .1 milliseconds), to see if there is a change in position.
-    * 
-    */
-   protected void movePlayer()
-   {
-      circle.setCenterX(x);
-      circle.setCenterY(y);
+      return yPos - (yHeight/2);
    }
 
+   
+   
+      protected void moveEnemy()
+   {
+      rectangle.setX(xPos);
+      rectangle.setY(yPos);
+   }
 }
+
