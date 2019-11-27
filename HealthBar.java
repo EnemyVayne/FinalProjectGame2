@@ -16,7 +16,7 @@ public class HealthBar extends Pane
 {
    
    private double xPos = Game.WIDTH / 2 - 150, yPos = 10;
-   private double xWidth = 300, yHeight = 25;
+   private static double xWidth = 300, yHeight = 25;
    private Rectangle rectangleGreen = new Rectangle(xPos, yPos, xWidth, yHeight);
    private Rectangle rectangleRed = new Rectangle(xPos, yPos, xWidth, yHeight);
 
@@ -34,7 +34,7 @@ public class HealthBar extends Pane
       getChildren().addAll(rectangleRed, rectangleGreen);
 
       animation = new Timeline(
-              new KeyFrame(Duration.millis(1), e -> HealthBarMovement()));
+              new KeyFrame(Duration.millis(30), e -> HealthBarMovement()));
       animation.setCycleCount(Timeline.INDEFINITE);
       animation.play();
    }
@@ -65,11 +65,6 @@ public class HealthBar extends Pane
    {
       return animation.rateProperty();
    }
-   
-   public double getHealthWidth()
-   {
-      return xWidth;
-   }
 
    public void LowerHealth()
    {
@@ -77,9 +72,16 @@ public class HealthBar extends Pane
       {
          xWidth -= speedX;
       }
-
-
-
+   }
+   
+   public double getHealth()
+   {
+       return xWidth;
+   }
+   
+   public static void setHealth(double Health)
+   {
+       HealthBar.xWidth = Health;
    }
 
    public void RaiseHealth()

@@ -11,7 +11,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
- *
+ * maybe wont have time for insertion sort on final, study 5.
  * @author kylef
  */
 public class Enemy extends Pane
@@ -151,7 +151,7 @@ public class Enemy extends Pane
 
    public Rectangle bounds()
    {
-      return (new Rectangle(xPos, yPos, xWidth, yHeight));
+      return (new Rectangle(xPos+xWidth/2, yPos+yHeight/2, xWidth, yHeight));
    }
 
    protected void moveEnemy()
@@ -160,16 +160,44 @@ public class Enemy extends Pane
       {
 
          case 1:
+            if(yPos <= 0)
+            {
+               moveDown();
+            }
+//            else
+//            {
             moveUp();
+//            }
             break;
          case 2:
-            moveDown();
+            if(yPos >= 710)
+            {
+               moveUp();
+            }
+//            else
+//            {
+               moveDown();
+//            }
             break;
          case 3:
-            moveLeft();
+            if(xPos <= 0)
+            {
+               moveRight();
+            }
+//            else
+//            {
+               moveLeft();
+//            }
             break;
          case 4:
-            moveRight();
+            if(xPos >= 1240)
+            {
+               moveLeft();
+            }
+//            else
+//            {
+               moveRight();  
+//            }
             break;
       }
 
