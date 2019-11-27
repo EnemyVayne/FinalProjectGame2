@@ -1,9 +1,10 @@
 package Game;
 
 import javafx.animation.KeyFrame;
-import javafx.scene.layout.Pane;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -16,12 +17,14 @@ import javafx.util.Duration;
 public class Enemy extends Pane
 {
 
+   private static int randomInt;
    private double xPos = Math.random() * 1262.62, yPos = Math.random() * 737.37;
-   private double xWidth = 50, yHeight = 50 ;
+   private double xWidth = 50, yHeight = 50;
    private Rectangle rectangle = new Rectangle(xPos, yPos, xWidth, yHeight);
-   private double speedX = 7;
-   private double speedY = 7;
+   private double speedX = 1;
+   private double speedY = 1;
    private Timeline animation;
+   private Timeline random;
 
    public Enemy()
    {
@@ -30,15 +33,27 @@ public class Enemy extends Pane
       getChildren().add(rectangle);
 
       animation = new Timeline(
-              new KeyFrame(Duration.millis(.1), e -> moveEnemy()));
+              new KeyFrame(Duration.millis(10), e -> moveEnemy()));
       animation.setCycleCount(Timeline.INDEFINITE);
       animation.play();
+
+      EventHandler<ActionEvent> eventHandler = e
+              -> 
+              {
+                 randomInt = ( int ) (Math.random() * ((4 - 1) + 1)) + 1;
+
+      };
+
+      random = new Timeline(
+              new KeyFrame(Duration.millis(2000), eventHandler));
+      random.setCycleCount(Timeline.INDEFINITE);
+      random.play();
    }
 
    /**
     * The method is used to resume play when the game is paused.
     */
-   public void play()
+   public void playAnimation()
    {
       animation.play();
    }
@@ -47,23 +62,33 @@ public class Enemy extends Pane
     * The method is used to pause the game, and can be started again by using
     * start method.
     */
-   public void pause()
+   public void pauseAnimation()
    {
       animation.pause();
    }
    
-      /**
+   public void pauseEnemy()
+   {
+      animation.pause();
+   }
+   
+   public void playEnemy()
+   {
+      animation.play();
+   }
+
+   /**
     * Used to bind the rate of application.
-    * 
+    *
     * @return Binding property value for rate.
     */
    public DoubleProperty rateProperty()
    {
       return animation.rateProperty();
    }
-   
-      /**
-    * The method is used to move the player north. The method works by taking a 
+
+   /**
+    * The method is used to move the player north. The method works by taking a
     * specified speed and adding it to the coordinate of the player so it moves
     * by the speed every tick of the animation.
     */
@@ -71,9 +96,9 @@ public class Enemy extends Pane
    {
       yPos -= speedY;
    }
-   
+
    /**
-    * The method is used to move the player south. The method works by taking a 
+    * The method is used to move the player south. The method works by taking a
     * specified speed and adding it to the coordinate of the player so it moves
     * by the speed every tick of the animation.
     */
@@ -82,8 +107,8 @@ public class Enemy extends Pane
       yPos += speedY;
    }
 
-    /**
-    * The method is used to move the player west. The method works by taking a 
+   /**
+    * The method is used to move the player west. The method works by taking a
     * specified speed and adding it to the coordinate of the player so it moves
     * by the speed every tick of the animation.
     */
@@ -92,8 +117,8 @@ public class Enemy extends Pane
       xPos -= speedX;
    }
 
-    /**
-    * The method is used to move the player east. The method works by taking a 
+   /**
+    * The method is used to move the player east. The method works by taking a
     * specified speed and adding it to the coordinate of the player so it moves
     * by the speed every tick of the animation.
     */
@@ -101,10 +126,11 @@ public class Enemy extends Pane
    {
       xPos += speedX;
    }
-   
-      /**
+
+   /**
     * The method grabs the private variable x to be able to use within different
     * classes.
+    *
     * @return Returns the variable found in Player class.
     */
    public double getX()
@@ -115,40 +141,39 @@ public class Enemy extends Pane
    /**
     * The method grabs the private variable y to be able to use within different
     * classes.
+    *
     * @return Returns the variable found in Player class.
     */
    public double getY()
    {
       return yPos;
    }
-   
 
-   public double getRightBoundryX()
+   public Rectangle bounds()
    {
-      return xPos + (xWidth/2);
-   }
-   
-   public double getLeftBoundryX()
-   {
-      return xPos - (xWidth/2);
+      return (new Rectangle(xPos, yPos, xWidth, yHeight));
    }
 
-   public double getTopBoundryY()
+   protected void moveEnemy()
    {
-      return yPos + (yHeight/2);
-   }
-   
-   public double getBottomBoundryY()
-   {
-      return yPos - (yHeight/2);
-   }
+      switch ( randomInt )
+      {
 
-   
-   
-      protected void moveEnemy()
-   {
+         case 1:
+            moveUp();
+            break;
+         case 2:
+            moveDown();
+            break;
+         case 3:
+            moveLeft();
+            break;
+         case 4:
+            moveRight();
+            break;
+      }
+
       rectangle.setX(xPos);
       rectangle.setY(yPos);
    }
 }
-

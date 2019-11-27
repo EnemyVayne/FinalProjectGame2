@@ -13,6 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
@@ -30,9 +31,11 @@ public class Game extends Application
    public static final int HEIGHT = 800;
    public Color colorGrass = new Color(0, .47, 0, .8);
    public Color colorRoom = new Color(.5, .2, .10, 1);
+   public Color colorHitBox = new Color(1,1,1,.5);
    public Color colorBlack = Color.BLACK;
 
    private Timeline loop2;
+   private Timeline loop3;
    private Label titleLabel, titleSpace;
    private boolean boundaryChange = false;
    private boolean enemyCollision = false;
@@ -58,7 +61,7 @@ public class Game extends Application
    @Override
    public void start( Stage stage ) throws Exception
    {
-      
+
       stage.setResizable(false);
       stage.show();
       stage.setX(300);
@@ -88,11 +91,6 @@ public class Game extends Application
       Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
       Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
       Scene ExploreScreen = new Scene(rootPaneExplore, WIDTH, HEIGHT);
-      
-      String Filepath = "Test1.wav";
-      
-      Music musicObj = new Music();
-      musicObj.playMusic( Filepath );
 
       titleLabel = new Label("The Suave Squad");
       titleSpace = new Label("Please press Space to continue...");
@@ -125,15 +123,10 @@ public class Game extends Application
 
                     case UP:
                        player.moveUp();
-                       
                        if ( boundaryChange )
                        {
                           rootPaneExplore.getChildren().addAll(backgroundExplore, player);
                           stage.setScene(ExploreScreen);
-                       }
-                       if (enemyCollision)
-                       {
-                          
                        }
                        break;
                     case DOWN:
@@ -178,31 +171,34 @@ public class Game extends Application
 
       player.requestFocus();
 
-      //if debugging change which screen, and then push a to get player coordinates.
-      ExploreScreen.setOnKeyPressed(e
-              -> 
-              {
-                 switch ( e.getCode() )
-                 {
-                    case A:
-                       System.out.println("the players x position is: "
-                               + player.getX());
-                       System.out.println("the players y position is: "
-                               + player.getY());
-                       System.out.println();
-                       break;
-
-                 }
-      });
+//      //if debugging change which screen, and then push a to get player coordinates.
+//      ExploreScreen.setOnKeyPressed(e
+//              -> 
+//              {
+//                 switch ( e.getCode() )
+//                 {
+//                    case A:
+//                       System.out.println("the players x position is: "
+//                               + player.getX());
+//                       System.out.println("the players y position is: "
+//                               + player.getY());
+//                       System.out.println();
+//                       break;
+//
+//                 }
+//      });
+      
 
       loop2 = new Timeline(
               new KeyFrame(Duration.millis(25), e -> BoundaryCheck()));
       loop2.setCycleCount(Timeline.INDEFINITE);
       loop2.play();
-      
-      
 
-      
+      loop3 = new Timeline(
+              new KeyFrame(Duration.millis(60), e -> CollisionDetection()));
+      loop3.setCycleCount(Timeline.INDEFINITE);
+      loop3.play();
+
    }
 
    /**
@@ -240,13 +236,38 @@ public class Game extends Application
          boundaryChange = true;
       }
    }
-   
+
    public void CollisionDetection()
    {
-      if (player.getBoundsInLocal().getWidth() >= enemy.getBoundsInLocal().getWidth())
+      Rectangle playerBounds = player.bounds();
+      Rectangle enemyBounds = enemy.bounds();
+
+      
+
+      Shape intersect = Rectangle.intersect(playerBounds, enemyBounds);
+
+      if ( intersect.getBoundsInLocal().getWidth() != -1 )
       {
-         System.out.println("WEVE COLLIDED WITH THE ENEMY SIR");
          enemyCollision = true;
+         healthBar.LowerHealth();
+      } else
+      {
+         enemyCollision = false;
+         healthBar.RaiseHealth();
+      }
+      
+      if (enemyCollision)
+      {
+         enemy.pauseEnemy();
+      }
+      else if (!enemyCollision)
+      {
+         enemy.playEnemy();
+      }
+      
+      if (healthBar.getHealthWidth() == 0)
+      {
+           player.Die();
       }
    }
 

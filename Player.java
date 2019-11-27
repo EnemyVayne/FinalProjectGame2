@@ -6,6 +6,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
@@ -112,17 +113,17 @@ public class Player extends Pane
     * The method is used to set the private variable x to a different value.
     * @param x is a coordinate of player
     */
-   public void setX( int x )
+   public void setX( double x )
    {
-      this.x = x;
+      x = this.x;
    }
    /**
     * The method is used to set the private variable y to a different value.
     * @param y is a coordinate of player
     */
-   public void setY( int y )
+   public void setY( double y )
    {
-      this.y = y;
+      y = this.y;
    }
    
    /**
@@ -146,25 +147,19 @@ public class Player extends Pane
    }
 
    
-   public double getRightBoundryX()
+   public Rectangle bounds()
    {
-      return x + (radius/2);
+      return (new Rectangle(x, y, 59, 59));
    }
    
-   public double getLeftBoundryX()
+   public void Die()
    {
-      return x - (radius/2);
-   }
 
-   public double getTopBoundryY()
-   {
-      return y + (radius/2);
+      setX(Game.HEIGHT / 2 - radius);
+      setY(Game.WIDTH / 2);
+      
    }
    
-   public double getBottomBoundryY()
-   {
-      return y - (radius/2);
-   }
    /**
     * The method is used to move the players coordinates, and is the main movement
     * command. The movePlayer method is looped through every time the animation
