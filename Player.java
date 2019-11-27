@@ -115,7 +115,7 @@ public class Player extends Pane
     */
    public void setX( double x )
    {
-      x = this.x;
+      this.x = x;
    }
    /**
     * The method is used to set the private variable y to a different value.
@@ -123,7 +123,7 @@ public class Player extends Pane
     */
    public void setY( double y )
    {
-      y = this.y;
+      this.y = y;
    }
    
    /**
@@ -155,8 +155,9 @@ public class Player extends Pane
    public void Die()
    {
 
-      setX(Game.HEIGHT / 2 - radius);
-      setY(Game.WIDTH / 2);
+      setX(Game.WIDTH / 2);
+      setY(Game.HEIGHT / 2 - radius);
+      HealthBar.setHealth(300);
       
    }
    
