@@ -18,7 +18,7 @@ public class Enemy extends Pane
 {
 
    private static int randomInt;
-   private double xPos = Math.random() * 1262.62, yPos = Math.random() * 737.37;
+   private double xPos = Math.random() * 1262.62, yPos = Math.random() * 725;
    private double xWidth = 50, yHeight = 50;
    private Rectangle rectangle = new Rectangle(xPos, yPos, xWidth, yHeight);
    private double speedX = 1;
@@ -31,6 +31,32 @@ public class Enemy extends Pane
       rectangle.setFill(Color.RED);
       rectangle.setStroke(Color.BLACK);
       getChildren().add(rectangle);
+
+      animation = new Timeline(
+              new KeyFrame(Duration.millis(10), e -> moveEnemy()));
+      animation.setCycleCount(Timeline.INDEFINITE);
+      animation.play();
+
+      EventHandler<ActionEvent> eventHandler = e
+              -> 
+              {
+                 randomInt = ( int ) (Math.random() * ((4 - 1) + 1)) + 1;
+
+      };
+
+      random = new Timeline(
+              new KeyFrame(Duration.millis(2000), eventHandler));
+      random.setCycleCount(Timeline.INDEFINITE);
+      random.play();
+   }
+   public Enemy(int spawnX, int spawnY)  //to choose where the enemy spawns
+   {
+      rectangle.setFill(Color.RED);
+      rectangle.setStroke(Color.BLACK);
+      getChildren().add(rectangle);
+      
+      xPos = spawnX;
+      yPos = spawnY;
 
       animation = new Timeline(
               new KeyFrame(Duration.millis(10), e -> moveEnemy()));
@@ -157,6 +183,12 @@ public class Enemy extends Pane
    public void Die()
    {
        Coins.setCoins(( int ) ((Math.random() * ((10 - 1) + 1)) + 1));
+   }
+   
+   public void Spawn()
+   {
+       xPos = Math.random() * 1240;
+       yPos = Math.random() * 710;
    }
 
    protected void moveEnemy()

@@ -34,6 +34,10 @@ public class Coins extends Pane
       Coins.coins += coins;
    }
    
+   public void Calc()
+   {
+       Coins.setCoins(( int ) (Math.random() * ((10 - 1) + 1)) + 1);
+   }
    
    
 }

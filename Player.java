@@ -161,6 +161,13 @@ public class Player extends Pane
       
    }
    
+   public void Spawn()
+   {
+      setX(Game.WIDTH / 2);
+      setY(Game.HEIGHT / 2 - radius);
+      PlayerHealthBar.setHealth(300);
+   }
+   
    /**
     * The method is used to move the players coordinates, and is the main movement
     * command. The movePlayer method is looped through every time the animation

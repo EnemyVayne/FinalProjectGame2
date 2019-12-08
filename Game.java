@@ -15,9 +15,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
+import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.FontWeight;
@@ -37,25 +36,29 @@ public class Game extends Application
     public static final int HEIGHT = 800;
     public Color colorGrass = new Color(0, .47, 0, .8);
     public Color colorRoom = new Color(.5, .2, .10, 1);
-    public Color colorHitBox = new Color(1, 1, 1, .5);
     public Color colorBlack = Color.BLACK;
 
     private Timeline loop2;
     private Timeline loop3;
-    private Timeline death;
-    private Label titleLabel, titleSpace;
+    private Timeline handler;
+
+
+    private Label titleLabel, titleSpace, itemLabel1, itemLabel2, itemLabel3, itemLabel4;
+    private Button btnBuy1, btnBuy2, btnBuy3, btnBuy4;
     private boolean boundaryChange = false;
     private boolean enemyCollision = false;
-    private boolean playerDead = false;
+    private boolean playerRecall = false;
     private boolean enemyDead = false;
+    private boolean npcIntersect = false;
+    int currentCoins;
 
-
-    Stage stage = new Stage();
     Player player = new Player();
     PlayerHealthBar playerHealthBar = new PlayerHealthBar();
     EnemyHealthBar enemyHealthBar = new EnemyHealthBar();
     Enemy enemy = new Enemy();
     Coins coins = new Coins();
+    NPC npc = new NPC();
+    Inventory inventory = new Inventory();
 
     /**
      * The method opens the stage, and creates numerous different objects, which
@@ -85,27 +88,24 @@ public class Game extends Application
 
         Rectangle backgroundTitle = new Rectangle(WIDTH, HEIGHT);
         Rectangle backgroundHome = new Rectangle(WIDTH, HEIGHT);
-        Rectangle backgroundExplore = new Rectangle(WIDTH, HEIGHT);
 
         backgroundHome.setFill(colorRoom);
-        backgroundExplore.setFill(colorGrass);
 
         StackPane rootPaneTitle = new StackPane();
         StackPane rootPaneHome = new StackPane();
-        StackPane rootPaneExplore = new StackPane();
 
         VBox titlePane1 = new VBox();
         StackPane titlePane2 = new StackPane();
-        HBox coinPane = new HBox();
-        coinPane.setAlignment(Pos.TOP_LEFT);
+        HBox HUDPane = new HBox();
+
+        HUDPane.setAlignment(Pos.TOP_LEFT);
 
         rootPaneTitle.getChildren().addAll(titlePane2, titlePane1);
         rootPaneHome.getChildren().addAll(backgroundHome, player, enemy,
-                playerHealthBar, enemyHealthBar, coinPane);
+                playerHealthBar, enemyHealthBar, HUDPane);
 
         Scene TitleScreen = new Scene(rootPaneTitle, WIDTH, HEIGHT);
         Scene HomeScreen = new Scene(rootPaneHome, WIDTH, HEIGHT);
-        Scene ExploreScreen = new Scene(rootPaneExplore, WIDTH, HEIGHT);
 
         titleLabel = new Label("The Suave Squad");
         titleSpace = new Label("Please press Space to continue...");
@@ -130,7 +130,7 @@ public class Game extends Application
 
         titlePane1.getChildren().addAll(titleLabel, titleSpace);
         titlePane2.getChildren().add(backgroundTitle);
-        coinPane.getChildren().addAll(coins.displayCoins(coins.getCoins()));
+        HUDPane.getChildren().addAll(coins.displayCoins(coins.getCoins()));
 
         stage.setTitle("Kyle And Wills RPG");
 
@@ -144,42 +144,26 @@ public class Game extends Application
 
                         case UP:
                             player.moveUp();
-                            if ( boundaryChange )
-                            {
-                                rootPaneExplore.getChildren().addAll(
-                                        backgroundExplore, player);
-                                stage.setScene(ExploreScreen);
-                            }
+
                             break;
                         case DOWN:
                             player.moveDown();
-                            if ( boundaryChange )
-                            {
-                                rootPaneExplore.getChildren().addAll(
-                                        backgroundExplore, player);
-                                stage.setScene(ExploreScreen);
-                                boundaryChange = false;
-                            }
+
                             break;
                         case LEFT:
                             player.moveLeft();
-                            if ( boundaryChange )
-                            {
-                                rootPaneExplore.getChildren().addAll(
-                                        backgroundExplore, player);
-                                stage.setScene(ExploreScreen);
-                                boundaryChange = false;
-                            }
+
                             break;
                         case RIGHT:
                             player.moveRight();
-                            if ( boundaryChange )
-                            {
-                                rootPaneExplore.getChildren().addAll(
-                                        backgroundExplore, player);
-                                stage.setScene(ExploreScreen);
-                                boundaryChange = false;
-                            }
+                            break;
+                        case B:
+
+                            playerRecall = true;
+                            break;
+                        case I:
+                            inventory.open();
+
                     }
         });
 
@@ -196,29 +180,63 @@ public class Game extends Application
 
         player.requestFocus();
 
-              EventHandler<ActionEvent> deathHandler = e
-              -> 
-              {
-                 if (enemyDead)
-                 {
+        EventHandler<ActionEvent> Handler = e
+                -> 
+                {
+                    
+                    if(enemyDead)
+                    {
+                                               rootPaneHome.getChildren().removeAll(enemy,
+                                enemyHealthBar);
+                    }
 
-                    rootPaneHome.getChildren().removeAll(enemy,enemyHealthBar);
 
-                 }
+                    if ( boundaryChange )
+                    {
+                        backgroundHome.setFill(colorGrass);
+                        rootPaneHome.getChildren().removeAll(enemy,
+                                enemyHealthBar, npc);
+                        rootPaneHome.getChildren().addAll(enemy,
+                                enemyHealthBar);
+                        RespawnEnemy();
 
-      };
-              
+                        boundaryChange = false;
+                    }
+                    if ( playerRecall )
+                    {
+                        rootPaneHome.getChildren().removeAll(enemy,
+                                enemyHealthBar, enemy.bounds());
+                        player.Spawn();
+                        backgroundHome.setFill(colorRoom);
+                        rootPaneHome.getChildren().addAll(npc);
+                        playerRecall = false;
+                    }
+                    if ( npcIntersect )
+                    {
+                        rootPaneHome.getChildren().addAll(ShopPane());
+                        npcIntersect = false;
+                    }
+                    if ( npcIntersect == false )
+                    {
+                        
+                        rootPaneHome.getChildren().removeAll(ShopPane());
+                    }
 
-              
-                    death = new Timeline(
-              new KeyFrame(Duration.millis(10), deathHandler));
-      death.setCycleCount(Timeline.INDEFINITE);
-      death.play();
-      
 
-      
+        };
+        
+
+        
+        
+
+
+        handler = new Timeline(
+                new KeyFrame(Duration.millis(30), Handler));
+        handler.setCycleCount(Timeline.INDEFINITE);
+        handler.play();
+
         loop2 = new Timeline(
-                new KeyFrame(Duration.millis(25), e -> BoundaryCheck()));
+                new KeyFrame(Duration.millis(30), e -> BoundaryCheck()));
         loop2.setCycleCount(Timeline.INDEFINITE);
         loop2.play();
 
@@ -264,53 +282,49 @@ public class Game extends Application
             player.setY(topBoundary);
             boundaryChange = true;
         }
+
     }
 
     public void CollisionDetection()
     {
+
         Rectangle playerBounds = player.bounds();
-        Rectangle enemyBounds = enemy.bounds();
+        Rectangle npcBounds = npc.bounds();
+        Shape intersectNPC = Rectangle.intersect(playerBounds, npcBounds);
 
-        Shape intersect = Rectangle.intersect(playerBounds, enemyBounds);
-
-        if ( intersect.getBoundsInLocal().getWidth() != -1 )
+        if ( enemyDead == false )
         {
-            enemyCollision = true;
-            
-            
-            if ( playerHealthBar.getHealth() >= 1 )
+            Rectangle enemyBounds = enemy.bounds();
+            Shape intersectEnemy = Rectangle.intersect(playerBounds, enemyBounds);
+            if ( intersectEnemy.getBoundsInLocal().getWidth() != -1 )
             {
-                playerHealthBar.LowerHealth();
-            } 
-            else if ( playerHealthBar.getHealth() == 0 )
-            {
-                player.Die();
-                playerDead = true;
-            }
-            if ( enemyHealthBar.getHealth() > 0 )
-            {
+                enemyCollision = true;
 
-                 enemyHealthBar.LowerHealth();
-            } 
-            else if ( enemyHealthBar.getHealth() == 0 )
-            {
-                int coin = 0;
-                enemyDead = true;
-                
-                while(coin<1)
+                if ( playerHealthBar.getHealth() >= 1 )
                 {
-                    Coins.setCoins(( int ) ((Math.random() * ((10 - 1) + 1)) + 1));
+                    playerHealthBar.LowerHealth();
+                } else if ( playerHealthBar.getHealth() == 0 )
+                {
+                    player.Die();
+                }
+                if ( enemyHealthBar.getHealth() > 0 )
+                {
+                    enemyHealthBar.LowerHealth();
+                } else if ( enemyHealthBar.getHealth() == 0 )
+                {
+                    enemyDead = true;
+                    coins.Calc();
+                    coins.getCoins();
                     coins.displayCoins(coins.getCoins());
+                    currentCoins = coins.getCoins();
                     System.out.println(coins.getCoins());
-                  coin++;
                 }
 
+            } else
+            {
+                enemyCollision = false;
+                playerHealthBar.RaiseHealth();
             }
-
-        } else
-        {
-            enemyCollision = false;
-            playerHealthBar.RaiseHealth();
         }
 
         if ( enemyCollision )
@@ -321,6 +335,56 @@ public class Game extends Application
             enemy.playEnemy();
         }
 
+        if ( intersectNPC.getBoundsInLocal().getWidth() != -1 )
+        {
+            npcIntersect = true;
+        } 
+        else 
+        {
+            npcIntersect = false;
+        }
+
+    }
+
+
+
+    public void RespawnEnemy()
+    {
+        enemyDead = false;
+        enemyHealthBar.Spawn();
+        enemy.Spawn();
+
+    }
+
+    public StackPane ShopPane()
+    {
+        StackPane rootPaneShop = new StackPane();
+        GridPane allPane = new GridPane();
+
+        
+        
+        
+        Rectangle backgroundRectangle = new Rectangle(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
+        backgroundRectangle.setStroke(Color.BLACK);
+        backgroundRectangle.setFill(Color.ANTIQUEWHITE);
+
+        itemLabel1 = new Label("Stick : 10 gold");
+        itemLabel2 = new Label("Iron Sword : 25 gold");
+        itemLabel3 = new Label("Steel Sword : 50 gold");
+        itemLabel4 = new Label("Diamond Sword : 100 gold");
+
+        btnBuy1 = new Button("Buy");
+        btnBuy2 = new Button("Buy");
+        btnBuy3 = new Button("Buy");
+        btnBuy4 = new Button("Buy");
+
+//        itemPane.getChildren().addAll(itemLabel1, itemLabel2, itemLabel3,
+//                itemLabel4);
+//        buttonPane.getChildren().addAll(btnBuy1,btnBuy2,btnBuy3,btnBuy4);
+//        allPane.getChildren().addAll(itemPane,buttonPane);
+//        rootPaneShop.getChildren().addAll(allPane, backgroundRectangle);
+
+        return rootPaneShop;
     }
 
     public static void main( String[] args )

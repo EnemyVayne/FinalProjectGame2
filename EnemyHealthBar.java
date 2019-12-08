@@ -81,8 +81,10 @@ public class EnemyHealthBar extends Pane
    
    public static void setHealth(double Health)
    {
-       EnemyHealthBar.xWidth = Health;
+       xWidth = Health;
    }
+   
+
 
    public void RaiseHealth()
    {
@@ -90,6 +92,14 @@ public class EnemyHealthBar extends Pane
       {
          xWidth += speedX;
       }
+   }
+   
+   public void Spawn()
+   {
+       xWidth = (int)(Math.random() * ((400 - 100) + 1)) + 100;
+       rectangleBlack.setWidth(xWidth);
+rectangleRed.setX(Game.WIDTH / 2 - xWidth/2);
+rectangleBlack.setX(Game.WIDTH / 2 - xWidth/2);
    }
 
    protected void HealthBarMovement()
