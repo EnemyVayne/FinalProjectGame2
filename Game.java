@@ -27,7 +27,7 @@ import javafx.util.Duration;
  * creates the panes/scenes/stages. The game starts off by declaring global
  * variables to be used throughout the application.
  *
- * @author Kyle_Faith
+ * @author Kyle Faith
  */
 public class Game extends Application
 {
@@ -41,16 +41,17 @@ public class Game extends Application
     private Timeline loop2;
     private Timeline loop3;
     private Timeline handler;
+    private Timeline boldChecker;
 
-
-    private Label titleLabel, titleSpace, itemLabel1, itemLabel2, itemLabel3, itemLabel4;
-    private Button btnBuy1, btnBuy2, btnBuy3, btnBuy4;
+    private Label titleLabel, titleSpace, itemLabel1, itemLabel2, itemLabel3, itemLabel4, itemLabel5;
+    private Button btnBuy1, btnBuy2, btnBuy3, btnBuy4, btnBuy5, btnClose;
     private boolean boundaryChange = false;
     private boolean enemyCollision = false;
     private boolean playerRecall = false;
     private boolean enemyDead = false;
     private boolean npcIntersect = false;
-    int currentCoins;
+    private boolean npcHere = false;
+    private boolean shopPaneOpen = false;
 
     Player player = new Player();
     PlayerHealthBar playerHealthBar = new PlayerHealthBar();
@@ -58,7 +59,8 @@ public class Game extends Application
     Enemy enemy = new Enemy();
     Coins coins = new Coins();
     NPC npc = new NPC();
-    Inventory inventory = new Inventory();
+
+    HBox HUDPane = new HBox();
 
     /**
      * The method opens the stage, and creates numerous different objects, which
@@ -73,6 +75,8 @@ public class Game extends Application
      *
      * @param stage The first window to be created.
      * @throws Exception
+     * 
+     * @author Kyle Faith
      */
     public void start( Stage stage ) throws Exception
     {
@@ -96,7 +100,6 @@ public class Game extends Application
 
         VBox titlePane1 = new VBox();
         StackPane titlePane2 = new StackPane();
-        HBox HUDPane = new HBox();
 
         HUDPane.setAlignment(Pos.TOP_LEFT);
 
@@ -141,29 +144,24 @@ public class Game extends Application
                 {
                     switch ( e.getCode() )
                     {
-
-                        case UP:
+                        case W:
                             player.moveUp();
 
                             break;
-                        case DOWN:
+                        case S:
                             player.moveDown();
-
                             break;
-                        case LEFT:
+                        case A:
                             player.moveLeft();
 
                             break;
-                        case RIGHT:
+                        case D:
                             player.moveRight();
                             break;
                         case B:
-
+                            npcHere = true;
                             playerRecall = true;
                             break;
-                        case I:
-                            inventory.open();
-
                     }
         });
 
@@ -183,14 +181,11 @@ public class Game extends Application
         EventHandler<ActionEvent> Handler = e
                 -> 
                 {
-                    
-                    if(enemyDead)
+                    if ( enemyDead )
                     {
-                                               rootPaneHome.getChildren().removeAll(enemy,
+                        rootPaneHome.getChildren().removeAll(enemy,
                                 enemyHealthBar);
                     }
-
-
                     if ( boundaryChange )
                     {
                         backgroundHome.setFill(colorGrass);
@@ -213,22 +208,22 @@ public class Game extends Application
                     }
                     if ( npcIntersect )
                     {
-                        rootPaneHome.getChildren().addAll(ShopPane());
-                        npcIntersect = false;
+                        if ( rootPaneHome.getChildren().size() <= 5 )
+                        {
+                            rootPaneHome.getChildren().addAll(ShopPane());
+                            shopPaneOpen = true;
+                        }
                     }
-                    if ( npcIntersect == false )
+                    if ( !npcIntersect )
                     {
-                        
-                        rootPaneHome.getChildren().removeAll(ShopPane());
+                        if ( rootPaneHome.getChildren().size() == 6 
+                                && shopPaneOpen == true )
+                        {
+                            rootPaneHome.getChildren().remove(5);
+                            shopPaneOpen = false;
+                        }
                     }
-
-
         };
-        
-
-        
-        
-
 
         handler = new Timeline(
                 new KeyFrame(Duration.millis(30), Handler));
@@ -253,6 +248,8 @@ public class Game extends Application
      * the coordinates to the opposite side. (boundaryChange is not used yet,
      * will be used on checkpoint 2 to allow player to truly step into new
      * scenes.)
+     * 
+     * @author Kyle Faith
      */
     public void BoundaryCheck()
     {
@@ -285,12 +282,20 @@ public class Game extends Application
 
     }
 
+    /**
+     * This method checks to see if the players current coordinates are
+     * coinciding with either the Enemy or the NPC. If the player is coinciding
+     * with the enemy, it calls functions which lower both the enemy and the
+     * players health bars.If the player is coinciding with the NPC, the shop
+     * pane opens up allowing the player to buy items to either do more damage
+     * or to move faster.
+     * 
+     * @author Kyle Faith
+     */
     public void CollisionDetection()
     {
 
         Rectangle playerBounds = player.bounds();
-        Rectangle npcBounds = npc.bounds();
-        Shape intersectNPC = Rectangle.intersect(playerBounds, npcBounds);
 
         if ( enemyDead == false )
         {
@@ -303,24 +308,28 @@ public class Game extends Application
                 if ( playerHealthBar.getHealth() >= 1 )
                 {
                     playerHealthBar.LowerHealth();
-                } else if ( playerHealthBar.getHealth() == 0 )
+                } 
+                else if ( playerHealthBar.getHealth() == 0 )
                 {
                     player.Die();
                 }
                 if ( enemyHealthBar.getHealth() > 0 )
                 {
                     enemyHealthBar.LowerHealth();
-                } else if ( enemyHealthBar.getHealth() == 0 )
+                } 
+                else if ( enemyHealthBar.getHealth() <= 0 )
                 {
                     enemyDead = true;
                     coins.Calc();
-                    coins.getCoins();
                     coins.displayCoins(coins.getCoins());
-                    currentCoins = coins.getCoins();
-                    System.out.println(coins.getCoins());
+                    HUDPane.getChildren().clear();
+                    HUDPane.getChildren().addAll(coins.displayCoins(
+                            coins.getCoins()));
+
                 }
 
-            } else
+            } 
+            else
             {
                 enemyCollision = false;
                 playerHealthBar.RaiseHealth();
@@ -330,41 +339,66 @@ public class Game extends Application
         if ( enemyCollision )
         {
             enemy.pauseEnemy();
-        } else if ( !enemyCollision )
+        } 
+        else if ( !enemyCollision )
         {
             enemy.playEnemy();
         }
+        if ( npcHere )
+        {
+            Rectangle npcBounds = npc.bounds();
+            Shape intersectNPC = Rectangle.intersect(playerBounds, npcBounds);
+            if ( intersectNPC.getBoundsInLocal().getWidth() != -1 )
+            {
 
-        if ( intersectNPC.getBoundsInLocal().getWidth() != -1 )
-        {
-            npcIntersect = true;
-        } 
-        else 
-        {
-            npcIntersect = false;
+                npcIntersect = true;
+
+            } 
+            else
+            {
+
+                npcIntersect = false;
+            }
         }
-
     }
 
-
-
+    /**
+     * This method sets the boolean enemyDead to false to allow for collision
+     * detection again, and spawns the enemy in a random place, and spawns a
+     * health bar of a random size.
+     * 
+     * @author Kyle Faith
+     */
     public void RespawnEnemy()
     {
         enemyDead = false;
         enemyHealthBar.Spawn();
         enemy.Spawn();
-
     }
 
+    /**
+     * This method creates the entire shop, which is only opened when the player
+     * object coincides with the NPC. It sets up buttons for buying objects, and
+     * labels for descriptions on what is being bought. The final button is a
+     * close button which closes the shop pane out, and allows the player to
+     * move again.
+     *
+     * @return rootPaneShop, which is a pane that added to the scene when a
+     * player walks into the NPC.
+     * 
+     * @author Kyle Faith
+     */
     public StackPane ShopPane()
     {
         StackPane rootPaneShop = new StackPane();
-        GridPane allPane = new GridPane();
+        GridPane Pane = new GridPane();
+        Pane.setHgap(5);
+        Pane.setVgap(5);
 
-        
-        
-        
-        Rectangle backgroundRectangle = new Rectangle(WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
+        Pane.setAlignment(Pos.CENTER);
+
+        Rectangle backgroundRectangle = new Rectangle(WIDTH / 2, HEIGHT / 2,
+                WIDTH / 2, HEIGHT / 2);
         backgroundRectangle.setStroke(Color.BLACK);
         backgroundRectangle.setFill(Color.ANTIQUEWHITE);
 
@@ -372,18 +406,168 @@ public class Game extends Application
         itemLabel2 = new Label("Iron Sword : 25 gold");
         itemLabel3 = new Label("Steel Sword : 50 gold");
         itemLabel4 = new Label("Diamond Sword : 100 gold");
+        itemLabel5 = new Label("Boots : 30 gold");
+
+        EventHandler<ActionEvent> eventHandler = e
+                -> 
+                {
+                    if ( coins.getCoins() >= 10 )
+                    {
+                        itemLabel1.setFont(Font.font("", FontWeight.BOLD, 25));
+                    } 
+                    else
+                    {
+                        itemLabel1.setFont(Font.font(""));
+                    }
+                    if ( coins.getCoins() >= 25 )
+                    {
+                        itemLabel2.setFont(Font.font("", FontWeight.BOLD, 25));
+                    } 
+                    else
+                    {
+                        itemLabel1.setFont(Font.font(""));
+                    }
+                    if ( coins.getCoins() >= 50 )
+                    {
+                        itemLabel3.setFont(Font.font("", FontWeight.BOLD, 25));
+                    }
+                    else
+                    {
+                        itemLabel1.setFont(Font.font(""));
+
+                    }
+                    if ( coins.getCoins() >= 100 )
+                    {
+                        itemLabel4.setFont(Font.font("", FontWeight.BOLD, 25));
+                    } 
+                    else
+                    {
+                        itemLabel1.setFont(Font.font(""));
+
+                    }
+                    if ( coins.getCoins() >= 30 )
+                    {
+                        itemLabel5.setFont(Font.font("", FontWeight.BOLD, 25));
+                    } 
+                    else
+                    {
+                        itemLabel1.setFont(Font.font(""));
+
+                    }
+
+        };
+
+        boldChecker = new Timeline(
+                new KeyFrame(Duration.millis(100), eventHandler));
+        boldChecker.setCycleCount(Timeline.INDEFINITE);
+        boldChecker.play();
 
         btnBuy1 = new Button("Buy");
         btnBuy2 = new Button("Buy");
         btnBuy3 = new Button("Buy");
         btnBuy4 = new Button("Buy");
+        btnBuy5 = new Button("Buy");
+        btnClose = new Button("Close");
 
-//        itemPane.getChildren().addAll(itemLabel1, itemLabel2, itemLabel3,
-//                itemLabel4);
-//        buttonPane.getChildren().addAll(btnBuy1,btnBuy2,btnBuy3,btnBuy4);
-//        allPane.getChildren().addAll(itemPane,buttonPane);
-//        rootPaneShop.getChildren().addAll(allPane, backgroundRectangle);
+        Pane.add(itemLabel1, 0, 0);
+        Pane.add(btnBuy1, 1, 0);
+        Pane.add(itemLabel2, 0, 1);
+        Pane.add(btnBuy2, 1, 1);
+        Pane.add(itemLabel3, 0, 2);
+        Pane.add(btnBuy3, 1, 2);
+        Pane.add(itemLabel4, 0, 3);
+        Pane.add(btnBuy4, 1, 3);
+        Pane.add(itemLabel5, 0, 4);
+        Pane.add(btnBuy5, 1, 4);
+        Pane.add(btnClose, 1, 5);
 
+        if ( coins.getCoins() >= 10 )
+        {
+            btnBuy1.setOnAction(( ActionEvent e )
+                    -> 
+                    {
+
+                        enemyHealthBar.setSpeedX(2);
+                        Pane.add(new Label("BOUGHT"), 2, 0);
+                        coins.setCoins(-10);
+                        HUDPane.getChildren().clear();
+                        HUDPane.getChildren().addAll(coins.displayCoins(
+                                coins.getCoins()));
+            }
+            );
+        }
+        if ( coins.getCoins() >= 25 )
+        {
+            btnBuy2.setOnAction(( ActionEvent e )
+                    -> 
+                    {
+                        enemyHealthBar.setSpeedX(3);
+                        Pane.add(new Label("BOUGHT"), 2, 1);
+
+                        coins.setCoins(-25);
+                        HUDPane.getChildren().clear();
+                        HUDPane.getChildren().addAll(coins.displayCoins(
+                                coins.getCoins()));
+            }
+            );
+        }
+        if ( coins.getCoins() >= 50 )
+        {
+            btnBuy3.setOnAction(( ActionEvent e )
+                    -> 
+                    {
+                        enemyHealthBar.setSpeedX(4);
+                        Pane.add(new Label("BOUGHT"), 2, 2);
+
+                        coins.setCoins(-50);
+                        HUDPane.getChildren().clear();
+                        HUDPane.getChildren().addAll(coins.displayCoins(
+                                coins.getCoins()));
+            }
+            );
+        }
+        if ( coins.getCoins() >= 100 )
+        {
+            btnBuy4.setOnAction(( ActionEvent e )
+                    -> 
+                    {
+                        enemyHealthBar.setSpeedX(5);
+                        Pane.add(new Label("BOUGHT"), 2, 3);
+
+                        coins.setCoins(-100);
+                        HUDPane.getChildren().clear();
+                        HUDPane.getChildren().addAll(coins.displayCoins(
+                                coins.getCoins()));
+            }
+            );
+        }
+        if ( coins.getCoins() >= 30 )
+        {
+            btnBuy5.setOnAction(( ActionEvent e )
+                    -> 
+                    {
+
+                        Pane.add(new Label("BOUGHT"), 2, 4);
+                        player.setSpeedX(15);
+                        player.setSpeedY(15);
+                        coins.setCoins(-30);
+                        HUDPane.getChildren().clear();
+                        HUDPane.getChildren().addAll(coins.displayCoins(
+                                coins.getCoins()));
+            }
+            );
+
+        }
+        btnClose.setOnAction(( ActionEvent e )
+                -> 
+                {
+                    rootPaneShop.getChildren().removeAll(backgroundRectangle,
+                            Pane);
+                    player.requestFocus();
+        }
+        );
+
+        rootPaneShop.getChildren().addAll(backgroundRectangle, Pane);
         return rootPaneShop;
     }
 

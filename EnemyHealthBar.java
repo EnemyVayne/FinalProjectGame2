@@ -9,8 +9,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
- *
- * @author kylef
+ * The class creates a health bar for the enemy, and allows for changing the 
+ * amount of health the enemy has, the speed at which the health decreases, 
+ * and allows for specific methods to control all of this. 
+ * 
+ * @author Kyle Faith
  */
 public class EnemyHealthBar extends Pane
 {
@@ -23,8 +26,13 @@ public class EnemyHealthBar extends Pane
    private double speedX = 1;
    private Timeline animation;
    
-   Enemy enemy;
-
+   /**
+    * The method creates a health bar for the enemy, allows for the enemy 
+    * health bar to be filled, and creates a time line for the enemies health 
+    * to tick down.
+    * 
+    * @author Kyle Faith
+    */
    public EnemyHealthBar()
    {
       rectangleRed.setFill(Color.RED);
@@ -41,6 +49,8 @@ public class EnemyHealthBar extends Pane
 
    /**
     * The method is used to resume play when the game is paused.
+    * 
+    * @author Kyle Faith
     */
    public void play()
    {
@@ -50,6 +60,8 @@ public class EnemyHealthBar extends Pane
    /**
     * The method is used to pause the game, and can be started again by using
     * start method.
+    * 
+    * @author Kyle Faith
     */
    public void pause()
    {
@@ -60,12 +72,21 @@ public class EnemyHealthBar extends Pane
     * Used to bind the rate of application.
     *
     * @return Binding property value for rate.
+    * 
+    * @author Kyle Faith
     */
    public DoubleProperty rateProperty()
    {
       return animation.rateProperty();
    }
 
+   /**
+    * The method reduces the enemies health bar by a consistent rate, which is 
+    * dictated by the variable speedX, as long as the health bar doesn't hit 
+    * 0 or below.
+    * 
+    * @author Kyle Faith
+    */
    public void LowerHealth()
    {
       if ( xWidth > 0 )
@@ -74,26 +95,50 @@ public class EnemyHealthBar extends Pane
       }
    }
    
+   /**
+    * The method allows the user to grab the xWidth variable from the class. 
+    * The xWidth variable is used for the size of the health bar, so therefore 
+    * is the amount of health the enemy has.
+    * 
+    * @return xWidth The size of the health bar.
+    * 
+    * @author Kyle Faith
+    */
    public double getHealth()
    {
        return xWidth;
    }
    
+   /**
+    * The method allows the user to set the amount of health the enemy has.
+    * 
+    * @param Health The amount of health.
+    * 
+    * @author Kyle Faith
+    */
    public static void setHealth(double Health)
    {
        xWidth = Health;
    }
    
-
-
-   public void RaiseHealth()
+   /**
+    * The method allows the user to set the amount of health the enemy has.
+    * 
+    * @param Health The amount of health.
+    * 
+    * @author Kyle Faith
+    */
+   public void setSpeedX(double x)
    {
-      if ( xWidth < 300  && xWidth != 0)
-      {
-         xWidth += speedX;
-      }
+       this.speedX = x;
    }
-   
+
+   /**
+    * The method creates the enemy health bar, with a random amount of health 
+    * between 100 to 400 health, and sets the position of the health bar.
+    * 
+    * @author Kyle Faith
+    */
    public void Spawn()
    {
        xWidth = (int)(Math.random() * ((400 - 100) + 1)) + 100;
@@ -101,7 +146,13 @@ public class EnemyHealthBar extends Pane
 rectangleRed.setX(Game.WIDTH / 2 - xWidth/2);
 rectangleBlack.setX(Game.WIDTH / 2 - xWidth/2);
    }
-
+   
+   /**
+    * The method is used by the animation to allow for the health bar to 
+    * increase or decrease based on the variable xWidth.
+    * 
+    * @author Kyle Faith
+    */
    protected void HealthBarMovement()
    {
 
